@@ -1,24 +1,16 @@
-import logo from './logo.svg';
+import { Route, Routes } from 'react-router-dom';
 import './App.css';
+import Docs from './Components/Docs';
+import EditDocs from './Components/EditDocs';
+import {app, database } from './Components/firebaseConfig';
 
 function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <Routes>
+      <Route path='/' element={ <Docs database={database}/>}/>
+      <Route path='/editdoc/:id' element={  <EditDocs database={database} />}/>
+    </Routes>
+
   );
 }
 
