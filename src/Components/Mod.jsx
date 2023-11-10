@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from 'react'
 import Box from '@mui/material/Box';
 import Modal from '@mui/material/Modal';
 import './docs.css'
-import { addDoc, collection ,onSnapshot} from 'firebase/firestore';
+import { addDoc, collection, deleteDoc, doc, onSnapshot } from 'firebase/firestore';
 import { database } from './firebaseConfig';
 import { useNavigate, useParams } from 'react-router-dom';
 
@@ -19,90 +19,101 @@ const style = {
 };
 
 
-function Mod({open,setOpen,setTitle,newtitle}) {
-  
+function Mod({ open, setOpen, setTitle, newtitle }) {
+
     const navigate = useNavigate()
-    const [docsData,setDocsData] = useState([])
+    const [docsData, setDocsData] = useState([])
     const isMounted = useRef()
     const collectionRef = collection(database, 'docsData')
 
     const handleClose = () => setOpen(false);
 
-    const addData = ()=>{
+    const addData = () => {
         // console.log(`newtitle: ${newtitle}`);
-        addDoc(collectionRef,{
+        addDoc(collectionRef, {
             title: newtitle,
-            docsDesc:""
+            docsDesc: ""
         })
-        .then(()=>{
-            alert('data Added')
-            handleClose()
-        })
-        .catch((error)=>{
-            alert('Cannot add data')
-            // console.log(error);
-        })
+            .then(() => {
+                alert(`${newtitle} added`)
+                handleClose()
+                setTitle('')
+            })
+            .catch((error) => {
+                alert('Cannot add data')
+                // console.log(error);
+            })
 
     }
 
-    const getData = ()=>{
-        onSnapshot(collectionRef,(data)=>{
-            setDocsData(data.docs.map((doc)=>{
-                return{...doc.data(),id: doc.id}
+    const getData = () => {
+        onSnapshot(collectionRef, (data) => {
+            setDocsData(data.docs.map((doc) => {
+                return { ...doc.data(), id: doc.id }
             }))
         })
     }
-    useEffect(()=>{
-       if(isMounted.current){
-        return
-       }
-       isMounted.current = true
-       getData()
-    },[])
+    useEffect(() => {
+        if (isMounted.current) {
+            return
+        }
+        isMounted.current = true
+        getData()
+    }, [])
 
-    const getId = (id)=>{
-      navigate(`/editdoc/${id}`)
+    const getId = (id) => {
+        navigate(`/editdoc/${id}`)
 
     }
-  return (
-    <>
-
-<div className='grid-main'>
-        {
-            docsData?.map((doc)=>{
-                return(
-               <>
-                     
-                        <div className='grid-child' >
-                       <div className='fonts'>
-                            <i class="fa-brands fa-dochub" onClick={()=>getId(doc.id)} ></i>
-                            <i className="fa-solid fa-trash"></i>
-                       </div>
-                            <p>{doc.title}</p>
-                            <div dangerouslySetInnerHTML={{__html: doc.docsDesc}} />
-                            
-                        </div>
-               </>
-                )
+    const deleteID = (id,title) => {
+        const docRef = doc(database, 'docsData', id)
+        deleteDoc(docRef)
+            .then(() => {
+                alert(`${title} deleted`)
+            }).catch((err) => {
+                console.log(`${err}`);
             })
-        }
-         
-</div>    <Modal
+
+    }
+    return (
+        <>
+
+            <div className='grid-main'>
+                {
+                    docsData?.length > 0 ? (docsData.map((doc) => {
+                        return (
+                           
+
+                                <div className='grid-child' >
+                                    <div className='fonts'>
+                                        <i class="fa-brands fa-dochub" onClick={() => getId(doc.id)} ></i>
+                                        <i className="fa-solid fa-trash" onClick={() => deleteID(doc.id,doc.title)} ></i>
+                                    </div>
+                                    <p>{doc.title}</p>
+                                    <div dangerouslySetInnerHTML={{ __html: doc.docsDesc }} />
+
+                                </div>
+                           
+                        )
+                    })) : <p className='noDoc'>No documents Available</p>
+                }
+
+            </div>    <Modal
                 open={open}
                 onClose={handleClose}
                 aria-labelledby="modal-modal-title"
                 aria-describedby="modal-modal-description"
             >
                 <Box sx={style}>
-                    <input value={newtitle} onChange={(e)=>setTitle(e.target.value)} className='add-input' type="text" placeholder='Add the Title'/>
+                    <input value={newtitle} onChange={(e) => setTitle(e.target.value)} className='add-input' type="text" placeholder='Add the Title' />
                     <div>
-                        <button onClick={addData}  className='add-docs'>Add</button>
+                        <button onClick={addData} className='add-docs'>Add</button>
                     </div>
 
                 </Box>
             </Modal>
-    </>
-  )
+        </>
+    )
 }
 
 export default Mod
