@@ -5,6 +5,8 @@ import './docs.css'
 import { addDoc, collection, deleteDoc, doc, onSnapshot } from 'firebase/firestore';
 import { database } from './firebaseConfig';
 import { useNavigate, useParams } from 'react-router-dom';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const style = {
     position: 'absolute',
@@ -20,6 +22,7 @@ const style = {
 
 
 function Mod({ open, setOpen, setTitle, newtitle }) {
+    
 
     const navigate = useNavigate()
     const [docsData, setDocsData] = useState([])
@@ -35,12 +38,12 @@ function Mod({ open, setOpen, setTitle, newtitle }) {
             docsDesc: ""
         })
             .then(() => {
-                alert(`${newtitle} added`)
+                toast.success(`${newtitle} added`)
                 handleClose()
                 setTitle('')
             })
             .catch((error) => {
-                alert('Cannot add data')
+                toast.warning('Cannot add data')
                 // console.log(error);
             })
 
@@ -69,7 +72,7 @@ function Mod({ open, setOpen, setTitle, newtitle }) {
         const docRef = doc(database, 'docsData', id)
         deleteDoc(docRef)
             .then(() => {
-                alert(`${title} deleted`)
+                toast.success(`${title} deleted`)
             }).catch((err) => {
                 console.log(`${err}`);
             })
@@ -87,9 +90,9 @@ function Mod({ open, setOpen, setTitle, newtitle }) {
                                 <div className='grid-child' >
                                     <div className='fonts'>
                                         <i class="fa-brands fa-dochub" onClick={() => getId(doc.id)} ></i>
-                                        <i className="fa-solid fa-trash" onClick={() => deleteID(doc.id,doc.title)} ></i>
+                                        <i style={{color:'red'}} className="fa-solid fa-trash" onClick={() => deleteID(doc.id,doc.title)} ></i>
                                     </div>
-                                    <p>{doc.title}</p>
+                                    <p style={{fontSize:'20px',fontWeight:'bold',color:'blue'}}>{doc.title || 'No Title'}</p>
                                     <div dangerouslySetInnerHTML={{ __html: doc.docsDesc }} />
 
                                 </div>
@@ -112,6 +115,9 @@ function Mod({ open, setOpen, setTitle, newtitle }) {
 
                 </Box>
             </Modal>
+            <ToastContainer
+            position="top-center"
+            autoClose={500} />
         </>
     )
 }

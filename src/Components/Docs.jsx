@@ -13,12 +13,13 @@ function Docs({database}) {
     };
   return (
    <>
+     
+      <div className={isDarkMode?'docs-main dark-mode':'light-mode docs-main'}>
       <div className='toggle'>
       <button onClick={toggleMode} style={{width:'10px',height:'10px',backgroundColor:'transparent'}}>
-            {isDarkMode ? <i class="fa-solid fa-sun  fa-xl " style={{color:'white'}}></i> :  <i class="fa-solid fa-moon  fa-xl " style={{color:''}}></i>}
+            {isDarkMode ? <i className="fa-solid fa-sun  fa-xl " style={{color:'yellow'}}></i> :  <i className="fa-solid fa-moon  fa-xl " style={{color:'black'}}></i>}
           </button>
       </div>
-      <div className={isDarkMode?'docs-main dark-mode':'light-mode docs-main'}>
           <h1>Docs</h1>
           <button onClick={handleOpen} className='add-document'>
               Add a Document
